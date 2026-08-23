@@ -6,3 +6,4 @@
 
 # wasm-pack build output
 /pkg/
+pkg/
