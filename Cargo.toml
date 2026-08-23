@@ -1,0 +1,39 @@
+[package]
+name = "oxml-wasm"
+version = "0.0.3"
+edition = "2024"
+rust-version = "1.86.0"
+license = "MIT OR Apache-2.0"
+description = "WebAssembly bindings for oxml: XML parsing and XPath in the browser"
+repository = "https://github.com/sebastienrousseau/oxml-wasm"
+homepage = "https://github.com/sebastienrousseau/oxml-wasm"
+documentation = "https://docs.rs/oxml-wasm"
+readme = "README.md"
+keywords = ["xml", "xpath", "wasm", "webassembly", "parser"]
+categories = ["wasm", "parser-implementations"]
+authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dev-dependencies]
+# The `#[wasm_bindgen]` layer cannot run under `cargo test`: it needs a
+# JavaScript runtime to hand values to. These tests run it in one.
+wasm-bindgen-test = "0.3"
+
+[dependencies]
+oxml = "0.0.3"
+wasm-bindgen = "0.2"
+
+[lints.rust]
+missing_docs = "warn"
+unused_results = "warn"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1

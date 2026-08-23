@@ -1,0 +1,107 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
+// Copyright (c) 2026 oxml. All rights reserved.
+
+//! WebAssembly bindings for [`oxml`].
+//!
+//! Being pure Rust with no C dependency is what makes this possible at
+//! all: `libxml`-based crates cannot target WebAssembly without a
+//! libxml2 toolchain, which is most of the reason a browser-side `XPath`
+//! has not been practical in Rust.
+//!
+//! The surface is deliberately small. JavaScript already has
+//! `DOMParser`; what it does not have is a fast, dependency-free `XPath`
+//! that behaves identically to the server-side one. That is what these
+//! bindings expose.
+
+#![forbid(unsafe_code)]
+
+use wasm_bindgen::prelude::*;
+
+mod core;
+
+/// A parsed XML document.
+#[wasm_bindgen]
+#[derive(Debug)]
+pub struct Document {
+    inner: oxml::Document,
+}
+
+/// Parse an XML document.
+///
+/// # Errors
+///
+/// Returns a `JsError` carrying the position and reason if the input
+/// is not well-formed.
+#[wasm_bindgen]
+pub fn parse(source: &str) -> Result<Document, JsError> {
+    core::parse(source)
+        .map(|inner| Document { inner })
+        .map_err(|e| JsError::new(&e))
+}
+
+#[wasm_bindgen]
+impl Document {
+    /// The number of nodes, including the document root.
+    #[wasm_bindgen(getter)]
+    #[must_use]
+    pub fn size(&self) -> usize {
+        self.inner.len()
+    }
+
+    /// The name of the root element, if there is one.
+    #[wasm_bindgen(js_name = rootName)]
+    #[must_use]
+    pub fn root_name(&self) -> Option<String> {
+        core::root_name(&self.inner)
+    }
+
+    /// Evaluate an `XPath` expression and return the matched nodes'
+    /// text, as an array of strings.
+    ///
+    /// Returning text rather than node handles is deliberate: a
+    /// `NodeId` is only meaningful against the document that issued
+    /// it, and handing an opaque integer across the WASM boundary
+    /// invites exactly the misuse the Rust API's lifetime rules
+    /// prevent.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if the expression is malformed.
+    #[wasm_bindgen(js_name = queryText)]
+    pub fn query_text(&self, expression: &str) -> Result<Vec<String>, JsError> {
+        core::query_text(&self.inner, expression).map_err(|e| JsError::new(&e))
+    }
+
+    /// Evaluate an `XPath` expression and return its value as a string.
+    ///
+    /// Use this for expressions that are not node-sets — `count(..)`,
+    /// `string(..)`, a comparison.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if the expression is malformed.
+    #[wasm_bindgen(js_name = queryValue)]
+    pub fn query_value(&self, expression: &str) -> Result<String, JsError> {
+        core::query_value(&self.inner, expression).map_err(|e| JsError::new(&e))
+    }
+
+    /// How many nodes an expression matches.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if the expression is malformed.
+    #[wasm_bindgen(js_name = queryCount)]
+    pub fn query_count(&self, expression: &str) -> Result<usize, JsError> {
+        core::query_count(&self.inner, expression).map_err(|e| JsError::new(&e))
+    }
+}
+
+/// Check whether a document is well-formed, without keeping it.
+///
+/// Cheaper than `parse` when the answer is all you need, because the
+/// tree is dropped immediately.
+#[wasm_bindgen(js_name = isWellFormed)]
+#[must_use]
+pub fn is_well_formed(source: &str) -> bool {
+    core::is_well_formed(source)
+}

@@ -1,0 +1,8 @@
+/target
+# Cargo.lock IS tracked here. `oxml` is a git dependency,
+# so without a lock every CI run resolves to whatever
+# `oxml@main` happens to be that day — green today, broken
+# tomorrow with no change of our own to explain it.
+
+# wasm-pack build output
+/pkg/
