@@ -49,9 +49,14 @@ try {
 ## Namespaces
 
 `document.evaluate` takes a namespace resolver. `oxml-wasm` has no
-equivalent, and prefixes in an expression are **not** resolved against
-the document's bindings — `//x:item` selects every `item`. Filter
-explicitly:
+equivalent yet.
+
+In the version this package links, prefixes are **not resolved at
+all** — `//x:item` selects every `item`. From oxml 0.0.4 they resolve
+against bindings supplied with the query, and an unbound prefix is an
+error; exposing that through these bindings is not done.
+
+Either way, filter explicitly:
 
 ```javascript
 doc.queryText("//*[namespace-uri()='urn:example' and local-name()='item']");

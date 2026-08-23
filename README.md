@@ -291,13 +291,25 @@ If you need the structure, query for the parts you need.
 
 ### How do I query a document with namespaces?
 
-Namespace prefixes in an expression are **not** resolved against the
-document's bindings: `//x:item` selects every `item` regardless of
-namespace. This is a known defect in the library. Filter explicitly:
+**This changes at oxml 0.0.4, and these bindings do not expose the fix
+yet.**
+
+In the version this package currently links, a prefix in an expression
+is not resolved: `//x:item` selects every `item` regardless of
+namespace. Filter on the URI:
 
 ```javascript
 doc.queryText("//*[namespace-uri()='urn:example' and local-name()='item']");
 ```
+
+From oxml 0.0.4 a prefixed name test resolves against bindings supplied
+with the query, an unbound prefix is a compile error, and an
+unprefixed name test matches only nodes in no namespace — which is
+XPath 1.0, and the same rule `document.evaluate` follows.
+
+Exposing that needs a second argument on the query methods, which is
+not implemented. The `namespace-uri()` form above works in both
+versions and is not going away.
 
 ### Do I have to call `free()`?
 
