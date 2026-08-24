@@ -117,9 +117,12 @@ want a yes-or-no answer and do not need the tree — it avoids handing a
 |---|---|
 | `size` | Number of nodes (a property, not a method) |
 | `rootName()` | The root element's local name, or `undefined` |
-| `queryText(expr)` | `string[]` — the string-value of each matched node |
-| `queryValue(expr)` | `string` — the expression's value, converted to a string |
-| `queryCount(expr)` | `number` — how many nodes matched |
+| `queryText(expr, ns?)` | `string[]` — the string-value of each matched node |
+| `queryValue(expr, ns?)` | `string` — the expression's value, converted to a string |
+| `queryCount(expr, ns?)` | `number` — how many nodes matched |
+
+`ns` is an optional array of `"PREFIX=URI"` strings — the same spelling
+`oxml-cli` takes for `--ns`, so the two are learned once.
 
 `queryText` is for node-sets. `queryValue` is for anything —
 `count(//x)`, `sum(//price)`, `string(//title)`, a boolean — and
@@ -291,25 +294,28 @@ If you need the structure, query for the parts you need.
 
 ### How do I query a document with namespaces?
 
-**This changes at oxml 0.0.4, and these bindings do not expose the fix
-yet.**
+Bind the prefix with the query:
 
-In the version this package currently links, a prefix in an expression
-is not resolved: `//x:item` selects every `item` regardless of
-namespace. Filter on the URI:
+```javascript
+doc.queryText("//m:item", ["m=urn:example"]);
+```
+
+The binding belongs to the *query*, not the document, so the same call
+works against a document that spells the prefix differently — only the
+URI has to match. An **unbound prefix throws** rather than silently
+matching on the local part.
+
+An **unprefixed** name test matches only nodes in no namespace, which
+is XPath 1.0's rule and the same one `document.evaluate` follows. If
+your document declares a default namespace, `//item` matches nothing —
+bind a prefix to that URI.
+
+`namespace-uri()` still works and needs no binding, which is useful
+when you know the URI and not the prefix:
 
 ```javascript
 doc.queryText("//*[namespace-uri()='urn:example' and local-name()='item']");
 ```
-
-From oxml 0.0.4 a prefixed name test resolves against bindings supplied
-with the query, an unbound prefix is a compile error, and an
-unprefixed name test matches only nodes in no namespace — which is
-XPath 1.0, and the same rule `document.evaluate` follows.
-
-Exposing that needs a second argument on the query methods, which is
-not implemented. The `namespace-uri()` form above works in both
-versions and is not going away.
 
 ### Do I have to call `free()`?
 
