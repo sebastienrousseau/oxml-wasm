@@ -179,3 +179,62 @@ mod tests {
         }
     }
 }
+
+/// The README's JavaScript examples, checked against the logic they
+/// describe.
+///
+/// The bindings layer is a one-line map per function, so anything the
+/// README claims about behaviour is decidable here without a
+/// WebAssembly toolchain. Two of its claims were wrong when written:
+/// the error message carries a line and column *before* the library's
+/// own byte offset, and `query_text` on an expression that is not a
+/// node-set returns a one-element array rather than throwing.
+#[cfg(test)]
+mod readme {
+    use super::*;
+
+    const CATALOGUE: &str = r#"<catalogue>
+        <book lang="en"><title>Dune</title><price>9.99</price></book>
+        <book lang="fr"><title>Germinal</title><price>7.50</price></book>
+    </catalogue>"#;
+
+    #[test]
+    fn the_quick_start_returns_what_the_readme_says() {
+        let doc = parse(CATALOGUE).expect("well-formed");
+        assert_eq!(root_name(&doc).as_deref(), Some("catalogue"));
+        assert_eq!(
+            query_text(&doc, "//title").expect("valid"),
+            ["Dune", "Germinal"]
+        );
+        assert_eq!(query_count(&doc, "//book").expect("valid"), 2);
+        assert_eq!(query_value(&doc, "sum(//price)").expect("valid"), "17.49");
+        assert!(!is_well_formed("<a>"));
+    }
+
+    #[test]
+    fn query_text_on_a_non_node_set_returns_one_element() {
+        // Not an error: the value is converted to a string and wrapped,
+        // so a caller iterating the result still gets something useful.
+        let doc = parse(CATALOGUE).expect("well-formed");
+        assert_eq!(query_text(&doc, "count(//book)").expect("valid"), ["2"]);
+        assert_eq!(query_count(&doc, "count(//book)").expect("valid"), 0);
+    }
+
+    #[test]
+    fn a_parse_error_leads_with_line_and_column() {
+        let message = parse("<a></b>").expect_err("mismatched tags");
+        assert!(
+            message.starts_with("1:4: "),
+            "the README shows a leading line:column -- got {message:?}"
+        );
+        assert!(message.contains("</b> closes <a>"), "{message}");
+    }
+
+    #[test]
+    fn an_invalid_expression_fails_at_query_time_not_parse_time() {
+        let doc = parse(CATALOGUE).expect("well-formed");
+        assert!(query_value(&doc, "//[").is_err());
+        assert!(query_text(&doc, "//[").is_err());
+        assert!(query_count(&doc, "//[").is_err());
+    }
+}

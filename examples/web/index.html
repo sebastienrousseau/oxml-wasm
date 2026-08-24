@@ -1,0 +1,65 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>oxml-wasm in a browser</title>
+<!--
+  No bundler. Build with `wasm-pack build --target web`, then serve
+  this directory: `python3 -m http.server`.
+-->
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; }
+  textarea { width: 100%; height: 9rem; font-family: ui-monospace, monospace; }
+  input { width: 100%; font-family: ui-monospace, monospace; padding: .4rem; }
+  pre { background: #f4f4f5; padding: .75rem; overflow-x: auto; }
+  .bad { color: #b91c1c; }
+</style>
+
+<h1>oxml-wasm</h1>
+<p>XPath 1.0 in the browser, with no C toolchain.</p>
+
+<label>Document<textarea id="xml">
+&lt;catalogue&gt;
+  &lt;book lang="en"&gt;&lt;title&gt;Dune&lt;/title&gt;&lt;price&gt;9.99&lt;/price&gt;&lt;/book&gt;
+  &lt;book lang="fr"&gt;&lt;title&gt;Germinal&lt;/title&gt;&lt;price&gt;7.50&lt;/price&gt;&lt;/book&gt;
+&lt;/catalogue&gt;</textarea></label>
+
+<label>Expression<input id="expr" value="//title" /></label>
+<pre id="out">…</pre>
+
+<script type="module">
+  import init, { parse } from "../../pkg/oxml_wasm.js";
+  await init();
+
+  const xml = document.querySelector("#xml");
+  const expr = document.querySelector("#expr");
+  const out = document.querySelector("#out");
+
+  function run() {
+    let doc;
+    try {
+      doc = parse(xml.value);
+    } catch (e) {
+      out.className = "bad";
+      out.textContent = e.message;
+      return;
+    }
+    try {
+      out.className = "";
+      const nodes = doc.queryText(expr.value);
+      out.textContent =
+        `${doc.queryCount(expr.value)} node(s)\n` +
+        `value: ${doc.queryValue(expr.value)}\n\n` +
+        nodes.join("\n");
+    } catch (e) {
+      out.className = "bad";
+      out.textContent = e.message;
+    } finally {
+      // The document is rebuilt on every keystroke, so freeing it
+      // matters here even though each one is small.
+      doc.free();
+    }
+  }
+
+  xml.addEventListener("input", run);
+  expr.addEventListener("input", run);
+  run();
+</script>
