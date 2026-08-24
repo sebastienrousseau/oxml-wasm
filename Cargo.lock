@@ -149,13 +149,13 @@ checksum = "d6790f58c7ff633d8771f42965289203411a5e5c68388703c06e14f24770b41e"
 
 [[package]]
 name = "oxml"
-version = "0.0.3"
+version = "0.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "65e194ab3f2b8896f5925e2f2770db4fd40a0bfc701d7fc9baa04cd72c3cf795"
+checksum = "092abfc68037ba9fb27484a0418bf1b8ebfe56ab8f8fb3dd6464595ed6a38902"
 
 [[package]]
 name = "oxml-wasm"
-version = "0.0.3"
+version = "0.0.4"
 dependencies = [
  "oxml",
  "wasm-bindgen",

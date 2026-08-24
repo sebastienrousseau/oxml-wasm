@@ -64,12 +64,29 @@ impl Document {
     /// invites exactly the misuse the Rust API's lifetime rules
     /// prevent.
     ///
+    ///
+    /// `namespaces` binds prefixes for the expression, each written
+    /// `"PREFIX=URI"` — the same spelling `oxml-cli` takes for `--ns`.
+    /// A prefix resolves against these bindings and not against the
+    /// document, so one query works across documents that spell the
+    /// prefix differently. An unbound prefix is an error.
+    ///
     /// # Errors
     ///
-    /// Returns a `JsError` if the expression is malformed.
+    /// Returns a `JsError` if the expression is malformed or uses an
+    /// unbound prefix.
     #[wasm_bindgen(js_name = queryText)]
-    pub fn query_text(&self, expression: &str) -> Result<Vec<String>, JsError> {
-        core::query_text(&self.inner, expression).map_err(|e| JsError::new(&e))
+    pub fn query_text(
+        &self,
+        expression: &str,
+        namespaces: Option<Vec<String>>,
+    ) -> Result<Vec<String>, JsError> {
+        core::query_text(
+            &self.inner,
+            expression,
+            &namespaces.unwrap_or_default(),
+        )
+        .map_err(|e| JsError::new(&e))
     }
 
     /// Evaluate an `XPath` expression and return its value as a string.
@@ -77,22 +94,56 @@ impl Document {
     /// Use this for expressions that are not node-sets — `count(..)`,
     /// `string(..)`, a comparison.
     ///
+    ///
+    /// `namespaces` binds prefixes for the expression, each written
+    /// `"PREFIX=URI"` — the same spelling `oxml-cli` takes for `--ns`.
+    /// A prefix resolves against these bindings and not against the
+    /// document, so one query works across documents that spell the
+    /// prefix differently. An unbound prefix is an error.
+    ///
     /// # Errors
     ///
-    /// Returns a `JsError` if the expression is malformed.
+    /// Returns a `JsError` if the expression is malformed or uses an
+    /// unbound prefix.
     #[wasm_bindgen(js_name = queryValue)]
-    pub fn query_value(&self, expression: &str) -> Result<String, JsError> {
-        core::query_value(&self.inner, expression).map_err(|e| JsError::new(&e))
+    pub fn query_value(
+        &self,
+        expression: &str,
+        namespaces: Option<Vec<String>>,
+    ) -> Result<String, JsError> {
+        core::query_value(
+            &self.inner,
+            expression,
+            &namespaces.unwrap_or_default(),
+        )
+        .map_err(|e| JsError::new(&e))
     }
 
     /// How many nodes an expression matches.
     ///
+    ///
+    /// `namespaces` binds prefixes for the expression, each written
+    /// `"PREFIX=URI"` — the same spelling `oxml-cli` takes for `--ns`.
+    /// A prefix resolves against these bindings and not against the
+    /// document, so one query works across documents that spell the
+    /// prefix differently. An unbound prefix is an error.
+    ///
     /// # Errors
     ///
-    /// Returns a `JsError` if the expression is malformed.
+    /// Returns a `JsError` if the expression is malformed or uses an
+    /// unbound prefix.
     #[wasm_bindgen(js_name = queryCount)]
-    pub fn query_count(&self, expression: &str) -> Result<usize, JsError> {
-        core::query_count(&self.inner, expression).map_err(|e| JsError::new(&e))
+    pub fn query_count(
+        &self,
+        expression: &str,
+        namespaces: Option<Vec<String>>,
+    ) -> Result<usize, JsError> {
+        core::query_count(
+            &self.inner,
+            expression,
+            &namespaces.unwrap_or_default(),
+        )
+        .map_err(|e| JsError::new(&e))
     }
 }
 
