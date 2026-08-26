@@ -5,6 +5,20 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.6] - 2026-08-26
+
+### Changed
+
+- Built on oxml 0.0.6 and xmlschema 0.0.6. The suite ships one version
+  number across all six crates.
+
+  xmlschema 0.0.6 is the substantial half of this release: its W3C
+  conformance pass rate moved from 71.7% to 95.6%, and its coverage of
+  the suite -- the share of tests that produce an answer meaning
+  anything -- from 27.0% to 87.6%. Schemas this crate previously read
+  as valid, and did not enforce, are now either enforced or reported
+  as unenforceable.
+
 ## [0.0.5] - 2026-08-24
 
 ### Changed
