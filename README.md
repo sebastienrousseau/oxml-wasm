@@ -27,7 +27,7 @@
 - [Errors](#errors)
 - [Migration](#migration) — from `DOMParser`
 - [Ecosystem comparison](#ecosystem-comparison)
-- [Capabilities in 0.0.5](#capabilities-in-005)
+- [Capabilities in 0.0.6](#capabilities-in-006)
 - [Bundle size](#bundle-size)
 - [Examples](#examples)
 - [When not to use oxml-wasm](#when-not-to-use-oxml-wasm)
@@ -230,7 +230,7 @@ when you need behaviour that does not vary by browser, or when the same
 queries have to run in Node and in a browser and give identical
 answers.
 
-## Capabilities in 0.0.5
+## Capabilities in 0.0.6
 
 - Full XML 1.0 and 1.1 parsing, namespaces resolved by URI
 - XPath 1.0: ten axes, 25 functions, all four value types
