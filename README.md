@@ -18,22 +18,36 @@
 
 ## Contents
 
-- [Why this is possible at all](#why-this-is-possible-at-all)
-- [Install](#install)
-- [Quick Start](#quick-start)
-- [The oxml ecosystem](#the-oxml-ecosystem)
-- [API](#api)
-- [Memory and lifetimes](#memory-and-lifetimes)
-- [Errors](#errors)
+**Getting started**
+
+- [Why this is possible at all](#why-this-is-possible-at-all) — a pure-Rust parser compiles to wasm; a C one does not
+- [Install](#install) — npm, from source
+- [Quick Start](#quick-start) — parse and query in ten lines
+
+**The oxml ecosystem**
+
+- [The oxml ecosystem](#the-oxml-ecosystem) — six crates, one version
+
+**Reference**
+
+- [API](#api) — every exported method
+- [Memory and lifetimes](#memory-and-lifetimes) — why `free()` exists
+- [Errors](#errors) — what throws, and what it says
 - [Migration](#migration) — from `DOMParser`
-- [Ecosystem comparison](#ecosystem-comparison)
-- [Capabilities in 0.0.6](#capabilities-in-006)
-- [Bundle size](#bundle-size)
-- [Examples](#examples)
+- [Ecosystem comparison](#ecosystem-comparison) — what each option costs you
+- [Capabilities in 0.0.6](#capabilities-in-006) — release inventory
+- [Bundle size](#bundle-size) — how to measure yours
+- [Benchmarks](#benchmarks) — the core operations, measured natively
+
+**Practical**
+
+- [Examples](#examples) — Node and the browser
 - [When not to use oxml-wasm](#when-not-to-use-oxml-wasm)
 - [FAQ](#faq)
 - [Development](#development)
 - [Security](#security)
+- [Documentation](#documentation)
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 ---
@@ -257,6 +271,36 @@ ls -l pkg/*.wasm
 Building without XPath, if you only need parsing and well-formedness
 checks, removes the whole expression engine.
 
+## Benchmarks
+
+```bash
+cargo bench --bench core
+```
+
+The benchmark measures `src/core.rs` **natively**, not through
+WebAssembly. That is deliberate: it isolates the parsing and query work
+from the JavaScript boundary, so a change in one is not read as a
+change in the other. What it cannot tell you is the cost of crossing
+that boundary, which depends on your bundler and engine.
+
+On a 129 KB document:
+
+| Operation | Time |
+|---|---:|
+| `parse` | 4.7 ms |
+| `isWellFormed` | 5.1 ms |
+| `queryCount("//item")` | 0.55 ms |
+| `queryText("//name")` | 0.44 ms |
+| 100 × `queryCount` on one parsed document | 78 ms |
+
+The last row is the point of the API's shape: parsing once and querying
+a hundred times costs about as much as sixteen parses, so a caller that
+re-parses per query pays for it. See
+[Memory and lifetimes](#memory-and-lifetimes).
+
+From one run on an Apple Silicon laptop that was **not** idle. These
+describe the machine as much as the code; compare runs, not numbers.
+
 ## Examples
 
 Runnable, and run in CI:
@@ -362,11 +406,35 @@ polyfilled fallback.
 ## Development
 
 ```bash
-cargo test                    # the core logic, natively
+./scripts/gate.sh
+```
+
+That runs everything CI runs, in the order that fails fastest: format,
+clippy, tests, rustdoc, the `#![forbid(unsafe_code)]` check, the wasm
+build, `wasm-pack build` and `wasm-pack test --node`, the generated
+bindings check, the Node examples, the 95% coverage floor and an MSRV
+build. It pins the toolchain rather than trusting
+`rust-toolchain.toml`, because a `RUSTUP_TOOLCHAIN` in the environment
+silently overrides that file and a lint that exists in one release and
+not another then makes a green local run and a red CI one.
+
+Without `wasm-pack` installed it says so and fails, rather than
+skipping the steps quietly — a check that vanishes when a tool is
+missing reports success over what it did not run.
+
+The individual steps, if you want them one at a time:
+
+```bash
+cargo test --all-features     # the core logic, natively
+cargo bench --bench core
 wasm-pack test --node         # the bindings
 wasm-pack build --target web
-node examples/node/basic.mjs
+./examples/run-all.sh
 ```
+
+The logic lives in `src/core.rs` and is tested natively, so most of the
+behaviour is covered without a WebAssembly toolchain. `src/lib.rs` is
+the thin `#[wasm_bindgen]` layer over it.
 
 The logic lives in `src/core.rs` and is tested natively, so most of the
 behaviour is covered without a WebAssembly toolchain. `src/lib.rs` is
@@ -382,6 +450,30 @@ a hostile document can do is exhaust the module's memory.
 
 See
 <https://github.com/sebastienrousseau/oxml/blob/main/doc/SECURITY-MODEL.md>.
+
+## Documentation
+
+- [API documentation](https://docs.rs/oxml-wasm)
+- [ARCHITECTURE.md](https://github.com/sebastienrousseau/oxml-wasm/blob/main/doc/ARCHITECTURE.md)
+- [MEMORY.md](https://github.com/sebastienrousseau/oxml-wasm/blob/main/doc/MEMORY.md)
+- [MIGRATION-FROM-DOMPARSER.md](https://github.com/sebastienrousseau/oxml-wasm/blob/main/doc/MIGRATION-FROM-DOMPARSER.md)
+- [TESTING.md](https://github.com/sebastienrousseau/oxml-wasm/blob/main/doc/TESTING.md)
+- [CHANGELOG.md](https://github.com/sebastienrousseau/oxml-wasm/blob/main/CHANGELOG.md)
+- [CONTRIBUTING.md](https://github.com/sebastienrousseau/oxml-wasm/blob/main/CONTRIBUTING.md)
+- [SECURITY.md](https://github.com/sebastienrousseau/oxml-wasm/blob/main/SECURITY.md)
+
+## Acknowledgements
+
+`oxml-wasm` exists because of work that came before it:
+
+- **[wasm-bindgen](https://github.com/rustwasm/wasm-bindgen)** and
+  **[wasm-pack](https://github.com/rustwasm/wasm-pack)** — the toolchain
+  that makes a Rust crate a JavaScript package.
+- **[lxml](https://lxml.de/)** and
+  **[libxml2](https://gitlab.gnome.org/GNOME/libxml2)** — decades of
+  hard-won correctness, and the yardstick for behaviour.
+- **[W3C](https://www.w3.org/TR/1999/REC-xpath-19991116/)** — for the
+  XPath 1.0 specification this follows.
 
 ## License
 
