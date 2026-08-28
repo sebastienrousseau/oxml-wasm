@@ -5,6 +5,36 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.7] - 2026-08-28
+
+### Added
+
+- **Benchmarks** for the exported operations, measuring `src/core.rs`
+  natively rather than through WebAssembly. That isolates the parsing
+  and query work from the JavaScript boundary, so a change in one is
+  not read as a change in the other -- and it is why the figures say
+  what they cannot tell you.
+
+- A **gate script** (`./scripts/gate.sh`) running everything CI runs,
+  including the `wasm-pack` steps. It skips those *loudly* when the
+  tool is absent, counting that as a failure: a check that vanishes
+  with its tool reports success over what it did not run.
+
+- The Node examples now **run in CI**. `basic.mjs` opens by saying "an
+  example that asserts fails CI instead" and the README listed them as
+  "Runnable, and run in CI". Nothing ran them.
+
+### Changed
+
+- Built on oxml 0.0.7, which reads a document from any `BufRead`. The
+  suite ships one version number across all six crates.
+
+- `core` is public, so the benchmark can reach it.
+
+- The README now follows the same shape as the rest of the suite, and
+  gained the Benchmarks, Documentation and Acknowledgements sections
+  it lacked.
+
 ## [0.0.6] - 2026-08-26
 
 ### Changed
