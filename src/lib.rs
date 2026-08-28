@@ -17,7 +17,13 @@
 
 use wasm_bindgen::prelude::*;
 
-mod core;
+/// The work, without the `wasm-bindgen` layer.
+///
+/// Public so it can be benchmarked and so the crate is usable from
+/// Rust as well as from JavaScript. The exports below are a thin
+/// translation of these into types `wasm-bindgen` can carry across
+/// the boundary; everything that decides anything lives here.
+pub mod core;
 
 /// A parsed XML document.
 #[wasm_bindgen]

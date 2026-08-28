@@ -11,6 +11,11 @@
 //! is a one-line map per function, with nothing left in it to get wrong.
 
 /// Parse a document, or describe why it is not well-formed.
+///
+/// # Errors
+///
+/// The message names the line and column, because it crosses into
+/// JavaScript where a caller has no other way to locate the fault.
 pub fn parse(source: &str) -> Result<oxml::Document, String> {
     oxml::parse(source).map_err(|e| {
         let (line, column) = e.line_column(source);
@@ -19,6 +24,7 @@ pub fn parse(source: &str) -> Result<oxml::Document, String> {
 }
 
 /// The local name of the root element, if there is one.
+#[must_use]
 pub fn root_name(doc: &oxml::Document) -> Option<String> {
     doc.root_element()
         .and_then(|r| doc.element_name(r))
@@ -66,6 +72,13 @@ fn compile(
 }
 
 /// The text of every matched node.
+///
+/// # Errors
+///
+/// If the expression does not compile, or names a namespace prefix
+/// that `namespaces` does not bind. An unbound prefix is an error
+/// rather than a silent non-match: it would otherwise look like a
+/// document that simply contains nothing.
 pub fn query_text(
     doc: &oxml::Document,
     expression: &str,
@@ -79,6 +92,10 @@ pub fn query_text(
 }
 
 /// The expression's value as a string.
+///
+/// # Errors
+///
+/// As [`query_text`].
 pub fn query_value(
     doc: &oxml::Document,
     expression: &str,
@@ -88,6 +105,10 @@ pub fn query_value(
 }
 
 /// How many nodes an expression matches.
+///
+/// # Errors
+///
+/// As [`query_text`].
 pub fn query_count(
     doc: &oxml::Document,
     expression: &str,
@@ -100,6 +121,13 @@ pub fn query_count(
 }
 
 /// Whether a document is well-formed, without keeping it.
+///
+/// This parses and discards. Reading the document as events instead
+/// would hold far less at once, and is *slower* -- about 1.9 times --
+/// because an event owns its text where the tree keeps ranges into
+/// the input. For an answer this small the tree is the cheaper route;
+/// see `oxml`'s `stream` module for when it is not.
+#[must_use]
 pub fn is_well_formed(source: &str) -> bool {
     oxml::parse(source).is_ok()
 }
