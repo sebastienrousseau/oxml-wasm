@@ -35,7 +35,7 @@
 - [Errors](#errors) — what throws, and what it says
 - [Migration](#migration) — from `DOMParser`
 - [Ecosystem comparison](#ecosystem-comparison) — what each option costs you
-- [Capabilities in 0.0.6](#capabilities-in-006) — release inventory
+- [Capabilities in 0.0.7](#capabilities-in-007) — release inventory
 - [Bundle size](#bundle-size) — how to measure yours
 - [Benchmarks](#benchmarks) — the core operations, measured natively
 
@@ -244,7 +244,7 @@ when you need behaviour that does not vary by browser, or when the same
 queries have to run in Node and in a browser and give identical
 answers.
 
-## Capabilities in 0.0.6
+## Capabilities in 0.0.7
 
 - Full XML 1.0 and 1.1 parsing, namespaces resolved by URI
 - XPath 1.0: ten axes, 25 functions, all four value types
