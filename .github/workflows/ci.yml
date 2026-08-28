@@ -83,6 +83,13 @@ jobs:
           test -f pkg/oxml_wasm.js
           test -f pkg/oxml_wasm.d.ts
           grep -q 'queryText' pkg/oxml_wasm.d.ts
+      # The Node examples assert rather than print, and say so in their
+      # own headers -- "an example that asserts fails CI instead" --
+      # but nothing ran them. They go here rather than in a job of
+      # their own because they need the same `wasm-pack` build, which
+      # takes minutes.
+      - name: Run every Node example, which asserts its own output
+        run: ./examples/run-all.sh
           echo "bindings generated"
 
   unsafe:
