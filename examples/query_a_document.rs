@@ -35,23 +35,26 @@ fn main() {
     assert_eq!(core::root_name(&doc).as_deref(), Some("catalogue"));
 
     // No prefix in the expression, so no bindings are needed.
-    let titles = core::query_text(&doc, "//book/title", &[]).expect("valid expression");
+    let titles =
+        core::query_text(&doc, "//book/title", &[]).expect("valid expression");
     println!("titles: {titles:?}");
     assert_eq!(titles, ["Dune", "Solaris"]);
 
-    let count = core::query_count(&doc, "//book", &[]).expect("valid expression");
+    let count =
+        core::query_count(&doc, "//book", &[]).expect("valid expression");
     println!("books: {count}");
     assert_eq!(count, 2);
 
-    let earliest =
-        core::query_value(&doc, "string(//book[2]/year)", &[]).expect("valid expression");
+    let earliest = core::query_value(&doc, "string(//book[2]/year)", &[])
+        .expect("valid expression");
     println!("second book's year: {earliest}");
     assert_eq!(earliest, "1961");
 
     // A prefix resolves against bindings passed with the query, not
     // against the document -- so it must be supplied here.
     let bindings = vec!["m=urn:example:media".to_owned()];
-    let discs = core::query_text(&doc, "//m:disc/title", &bindings).expect("valid expression");
+    let discs = core::query_text(&doc, "//m:disc/title", &bindings)
+        .expect("valid expression");
     println!("discs: {discs:?}");
     assert_eq!(discs, ["Blade Runner"]);
 
