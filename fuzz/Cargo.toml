@@ -1,0 +1,35 @@
+[workspace]
+
+[package]
+name = "oxml-wasm-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.oxml-wasm]
+path = ".."
+
+# Fuzzing wants the optimised build; debug assertions stay on so
+# overflow checks and `debug_assert!` still fire on found inputs.
+[profile.release]
+debug = true
+debug-assertions = true
+overflow-checks = true
+
+[[bin]]
+name = "core"
+path = "fuzz_targets/core.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "query"
+path = "fuzz_targets/query.rs"
+test = false
+doc = false
