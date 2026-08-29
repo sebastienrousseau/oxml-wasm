@@ -5,6 +5,32 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.8] - 2026-08-29
+
+### Added
+
+- A fuzz target over the exported operations, run for 300 seconds on
+  every pull request.
+
+- **The examples are measured against the public API** of `core`,
+  where the deciding logic lives. The `#[wasm_bindgen]` layer is
+  excluded per-function -- it needs a JavaScript runtime and is
+  covered by the Node examples -- so a plain `pub fn` added beside it
+  is still checked.
+
+### Security
+
+- **`wasm-pack` is installed through a pinned action** rather than
+  `curl -sSf https://... | sh`. The script was fetched over the
+  network and executed unverified on every run, so whatever it
+  contained that day became part of the build.
+
+- **`cargo audit` and `cargo deny` now actually run.** The badge said
+  they did; only `oxml` had the workflow.
+
+- Every action pinned by commit SHA, branch coverage gated, CodeQL
+  added, and the DCO enforced.
+
 ## [0.0.7] - 2026-08-28
 
 ### Added
