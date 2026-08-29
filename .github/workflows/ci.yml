@@ -190,8 +190,15 @@ jobs:
       # natively can still fail to compile to wasm, and that failure
       # would otherwise surface only to whoever ran `wasm-pack` next.
       - run: cargo build --target wasm32-unknown-unknown --release
-      - name: Install wasm-pack
-        run: curl -sSf https://rustwasm.github.io/wasm-pack/installer/init.sh | sh
+      # Installed through a pinned action rather than
+      # `curl https://... | sh`. Scorecard flagged that as
+      # `downloadThenRun not pinned by hash`, and it was right: the
+      # script was fetched over the network and executed unverified on
+      # every run, so whatever it happened to contain that day became
+      # part of this build.
+      - uses: taiki-e/install-action@742a3317eac7bd62f91cd888b4eead5e784ba833 # main
+        with:
+          tool: wasm-pack@0.15.0
       - run: wasm-pack build --target web --release
       # The `#[wasm_bindgen]` layer cannot run under `cargo test`, so
       # without this job nothing exercises the JavaScript-facing API at
