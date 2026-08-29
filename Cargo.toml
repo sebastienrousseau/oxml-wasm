@@ -25,6 +25,10 @@ wasm-bindgen-test = "0.3"
 oxml = "0.0.7"
 wasm-bindgen = "0.2"
 
+[[example]]
+name = "query_a_document"
+path = "examples/query_a_document.rs"
+
 [lints.rust]
 missing_docs = "warn"
 unused_results = "warn"
