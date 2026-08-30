@@ -13,6 +13,29 @@ keywords = ["xml", "xpath", "wasm", "webassembly", "parser"]
 categories = ["wasm", "parser-implementations"]
 authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
 
+# What reaches crates.io.
+#
+# Without this, cargo packages every tracked file: CI workflows, the
+# dependabot config, .gitignore, the DCO, the governance documents.
+# That is how oxml-json 0.0.8 shipped an assurance case describing a
+# different crate -- a file nobody thought of as published, uploaded to
+# a registry where nothing can be edited afterwards.
+#
+# Listed rather than excluded, so a new directory is absent by default
+# instead of shipped by default.
+include = [
+    "/CHANGELOG.md",
+    "/Cargo.toml",
+    "/LICENSE",
+    "/LICENSE-APACHE",
+    "/LICENSE-MIT",
+    "/README.md",
+    "/benches/**",
+    "/examples/**",
+    "/src/**",
+    "/tests/**",
+]
+
 [lib]
 crate-type = ["cdylib", "rlib"]
 
