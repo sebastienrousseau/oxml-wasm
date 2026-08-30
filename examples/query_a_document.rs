@@ -62,4 +62,41 @@ fn main() {
     let unbound = core::query_text(&doc, "//m:disc", &[]);
     println!("unbound prefix: {unbound:?}");
     assert!(unbound.is_err(), "an unbound prefix must be reported");
+
+    // Writing the document back out. The counterpart to `parse`.
+    let xml = core::to_xml(&doc);
+    println!("serialised {} bytes", xml.len());
+
+    // A fixed point, not a byte-identical copy: a document has more
+    // than one valid spelling, so the guarantee is that parsing the
+    // output and serialising it again produces the same text.
+    let again = core::parse(&xml).expect("the serialised document parses");
+    assert_eq!(
+        core::to_xml(&again),
+        xml,
+        "serialisation must be a fixed point"
+    );
+
+    // Escaping survives the round trip. `&` in text and `<` inside an
+    // attribute both have to come back escaped, or the second parse
+    // would see markup where the first saw characters.
+    let tricky = core::parse(r#"<a note="x &lt; y">p &amp; q</a>"#)
+        .expect("well-formed");
+    let out = core::to_xml(&tricky);
+    println!("escaped: {out}");
+    assert!(out.contains("&amp;"), "text `&` must stay escaped: {out}");
+    assert!(
+        out.contains("&lt;"),
+        "attribute `<` must stay escaped: {out}"
+    );
+    assert_eq!(
+        core::query_value(
+            &core::parse(&out).expect("reparses"),
+            "string(//a)",
+            &[]
+        )
+        .expect("valid expression"),
+        "p & q",
+        "the text must survive the round trip unchanged"
+    );
 }

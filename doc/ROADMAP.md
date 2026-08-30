@@ -5,7 +5,8 @@
 ## Where this is
 
 WebAssembly bindings for `oxml`: parse a document, ask XPath 1.0
-questions of it, get strings back.
+questions of it, get strings back, and write it out again --
+serialisation landed at 0.0.9 and was the first item on this list.
 
 Being pure Rust with no C dependency is what makes this possible at
 all. `libxml`-based crates cannot target WebAssembly without a libxml2
@@ -25,19 +26,13 @@ hand values to.
 
 ## The order
 
-**1. Serialisation.** `oxml` gained `to_xml()` at 0.0.8 and these
-bindings do not expose it, so "you need to produce XML" is still a
-reason not to use this. It is the smallest gap with the clearest
-demand: a caller that can read but not write has to reach for
-`XMLSerializer` and hold two representations.
-
-**2. Node handles rather than strings.** Every query returns strings.
+**1. Node handles rather than strings.** Every query returns strings.
 A caller that wants to ask a follow-up question about a matched node
 has to re-query from the root with a longer expression. Returning an
 opaque handle that later calls accept would fix that, and is bounded
 work now that `Document` already crosses the boundary.
 
-**3. Bounded parsing for the heap ceiling.** WebAssembly linear memory
+**2. Bounded parsing for the heap ceiling.** WebAssembly linear memory
 has a ceiling, and the whole tree is built in it. `oxml`'s limits API
 can refuse a document before it exhausts that, which turns a crashed
 module into an error a caller can handle.
