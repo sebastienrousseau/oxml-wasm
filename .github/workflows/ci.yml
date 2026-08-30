@@ -269,3 +269,38 @@ jobs:
       - run: >
           cargo llvm-cov --all-features --fail-under-lines 95
           --ignore-filename-regex 'builds/cargo/package|src/lib\.rs'
+
+  msrv:
+    name: MSRV
+    runs-on: ubuntu-latest
+    # `rust-toolchain.toml` pins the compiler this project builds with;
+    # `rust-version` in Cargo.toml states the oldest one it supports.
+    # Nothing was checking the second, so a change using a newer
+    # language feature compiled here and broke for anyone on the stated
+    # minimum -- who found out instead of CI.
+    #
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Read rather than repeated, so the manifest and the job cannot
+      # drift into disagreeing about what the minimum is.
+      - name: Read rust-version from Cargo.toml
+        id: msrv
+        run: |
+          V=$(grep -m1 '^rust-version' Cargo.toml | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?')
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+      - uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # master
+        with:
+          toolchain: ${{ steps.msrv.outputs.version }}
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+      - name: Build on the stated minimum
+        # `rust-toolchain.toml` pins a newer compiler and would override
+        # the MSRV toolchain just installed, quietly turning this into
+        # "does it build on the pinned version" -- which it does, and
+        # which proves nothing about what the manifest claims.
+        #
+        # It has to be set on the step, not the job: `steps.msrv.outputs`
+        # does not exist yet when job-level `env` is evaluated, so there
+        # it silently expands to empty.
+        env:
+          RUSTUP_TOOLCHAIN: ${{ steps.msrv.outputs.version }}
+        run: cargo check --all-features
