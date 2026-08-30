@@ -97,6 +97,7 @@ doc.size;                              // node count (a property)
 doc.queryText("//title");             // ["Dune", "Germinal"]
 doc.queryCount("//book");             // 2
 doc.queryValue("sum(//price)");       // "17.49"
+doc.toXml();                          // the document back as XML
 
 isWellFormed("<a>");                 // false
 ```
@@ -136,6 +137,7 @@ want a yes-or-no answer and do not need the tree — it avoids handing a
 | `queryText(expr, ns?)` | `string[]` — the string-value of each matched node |
 | `queryValue(expr, ns?)` | `string` — the expression's value, converted to a string |
 | `queryCount(expr, ns?)` | `number` — how many nodes matched |
+| `toXml()` | `string` — the document as XML |
 
 `ns` is an optional array of `"PREFIX=URI"` strings — the same spelling
 `oxml-cli` takes for `--ns`, so the two are learned once.
@@ -322,7 +324,6 @@ Runnable, and run in CI:
   download.
 - **You are only reading a small, known document.** A WebAssembly
   module is a lot of machinery for one `querySelector`-shaped job.
-- **You need to produce XML.** No serialiser.
 - **Documents are larger than the Wasm heap.** The whole tree is built
   in memory, inside a linear memory that has a ceiling.
 

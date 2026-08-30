@@ -132,9 +132,86 @@ pub fn is_well_formed(source: &str) -> bool {
     oxml::parse(source).is_ok()
 }
 
+/// The document as XML.
+///
+/// The counterpart to [`parse`]. `oxml` gained serialisation in 0.0.8
+/// and these bindings did not expose it, so a caller could read a
+/// document but not write one back and had to reach for
+/// `XMLSerializer`, holding two representations of the same thing.
+///
+/// Escaping is applied where it changes meaning rather than
+/// everywhere: `&`, `<` and `>` in text, and additionally `"`, tab,
+/// newline and carriage return inside attribute values, where an
+/// unescaped newline would normalise to a space on the way back in
+/// and the round trip would not be one.
+#[must_use]
+pub fn to_xml(doc: &oxml::Document) -> String {
+    doc.to_xml()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn serialisation_is_a_fixed_point() {
+        // Not byte-identical to the input: a document has more than
+        // one valid spelling. The guarantee is that the output parses
+        // to something that serialises the same way.
+        let doc = parse(DOC).expect("well-formed");
+        let once = to_xml(&doc);
+        let twice = to_xml(&parse(&once).expect("the output parses"));
+        assert_eq!(once, twice);
+    }
+
+    #[test]
+    fn text_escaping_survives_the_round_trip() {
+        // If `&` came back unescaped the second parse would read an
+        // entity reference where the first read a character.
+        let doc = parse("<a>p &amp; q</a>").expect("well-formed");
+        let out = to_xml(&doc);
+        assert!(out.contains("&amp;"), "{out}");
+        let again = parse(&out).expect("reparses");
+        assert_eq!(query_value(&again, "string(//a)", &[]).unwrap(), "p & q");
+    }
+
+    #[test]
+    fn attribute_escaping_survives_the_round_trip() {
+        // A `<` written literally in an attribute would make the
+        // reparse see markup.
+        let doc = parse(r#"<a note="x &lt; y"/>"#).expect("well-formed");
+        let out = to_xml(&doc);
+        assert!(out.contains("&lt;"), "{out}");
+        let again = parse(&out).expect("reparses");
+        assert_eq!(
+            query_value(&again, "string(//a/@note)", &[]).unwrap(),
+            "x < y"
+        );
+    }
+
+    #[test]
+    fn a_newline_in_an_attribute_is_escaped() {
+        // An unescaped newline normalises to a space on the way back
+        // in, so the round trip would silently change the value.
+        let doc = parse("<a note=\"x&#10;y\"/>").expect("well-formed");
+        let out = to_xml(&doc);
+        let again = parse(&out).expect("reparses");
+        assert_eq!(
+            query_value(&again, "string(//a/@note)", &[]).unwrap(),
+            "x\ny",
+            "serialised as: {out}"
+        );
+    }
+
+    #[test]
+    fn namespaces_survive_the_round_trip() {
+        let doc = parse(r#"<r xmlns:m="urn:x"><m:i>v</m:i></r>"#)
+            .expect("well-formed");
+        let out = to_xml(&doc);
+        let again = parse(&out).expect("reparses");
+        let ns = vec!["m=urn:x".to_owned()];
+        assert_eq!(query_text(&again, "//m:i", &ns).unwrap(), ["v"]);
+    }
 
     const DOC: &str = "<library count=\"2\">\
         <book lang=\"en\"><title>Dune</title></book>\

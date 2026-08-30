@@ -151,6 +151,22 @@ impl Document {
         )
         .map_err(|e| JsError::new(&e))
     }
+
+    /// The document as XML.
+    ///
+    /// The counterpart to `parse`. Reading a document and writing it
+    /// back previously meant reaching for `XMLSerializer` and holding
+    /// two representations of the same thing.
+    ///
+    /// Round-trips: the output parses to a document that serialises
+    /// identically. It is not guaranteed byte-identical to the input,
+    /// because a document has more than one valid spelling -- entity
+    /// references and attribute order among them.
+    #[wasm_bindgen(js_name = toXml)]
+    #[must_use]
+    pub fn to_xml(&self) -> String {
+        core::to_xml(&self.inner)
+    }
 }
 
 /// Check whether a document is well-formed, without keeping it.
