@@ -132,7 +132,7 @@ jobs:
         with:
           toolchain: nightly
           components: llvm-tools-preview
-      - uses: taiki-e/install-action@742a3317eac7bd62f91cd888b4eead5e784ba833 # main
+      - uses: taiki-e/install-action@fa23953489c080190314742a9b907f8e97c6767c # main
         with:
           tool: cargo-llvm-cov
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
@@ -196,7 +196,7 @@ jobs:
       # script was fetched over the network and executed unverified on
       # every run, so whatever it happened to contain that day became
       # part of this build.
-      - uses: taiki-e/install-action@742a3317eac7bd62f91cd888b4eead5e784ba833 # main
+      - uses: taiki-e/install-action@fa23953489c080190314742a9b907f8e97c6767c # main
         with:
           tool: wasm-pack@0.15.0
       - run: wasm-pack build --target web --release
@@ -228,7 +228,7 @@ jobs:
         with:
           toolchain: stable
           components: llvm-tools-preview
-      - uses: taiki-e/install-action@742a3317eac7bd62f91cd888b4eead5e784ba833 # main
+      - uses: taiki-e/install-action@fa23953489c080190314742a9b907f8e97c6767c # main
         with:
           tool: cargo-llvm-cov
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
@@ -259,7 +259,7 @@ jobs:
         with:
           toolchain: 1.98.0
           components: llvm-tools-preview
-      - uses: taiki-e/install-action@742a3317eac7bd62f91cd888b4eead5e784ba833 # main
+      - uses: taiki-e/install-action@fa23953489c080190314742a9b907f8e97c6767c # main
         with:
           tool: cargo-llvm-cov
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
