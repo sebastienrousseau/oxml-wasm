@@ -8,3 +8,5 @@
 /pkg/
 pkg/
 .DS_Store
+/site
+.cache
