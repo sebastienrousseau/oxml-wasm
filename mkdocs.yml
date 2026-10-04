@@ -2,7 +2,7 @@
 site_name: oxml-wasm
 site_description: >-
   WebAssembly bindings for oxml: XML parsing and XPath in the browser and Node.js.
-site_url: https://sebastienrousseau.github.io/oxml-wasm/
+site_url: https://wasm.oxmllib.com/
 site_author: Sebastien Rousseau
 copyright: Copyright &copy; 2026 <a href="https://sebastienrousseau.com/" rel="author">Sebastien Rousseau</a>
 
