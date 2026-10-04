@@ -16,6 +16,10 @@
   <a href="https://www.bestpractices.dev/projects/14314"><img src="https://img.shields.io/cii/level/14314?style=for-the-badge&label=OpenSSF%20Best%20Practices&logo=openssf" alt="OpenSSF Best Practices" /></a>
 </p>
 
+<p align="center">
+  <img src=".github/demo.gif" alt="oxml-wasm Demo" width="100%" />
+</p>
+
 ---
 
 ## Contents
