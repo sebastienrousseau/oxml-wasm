@@ -155,7 +155,7 @@ checksum = "21cfe82a88f49f99d04270f9c40041e372b3fc12050c140e84e672810e82a651"
 
 [[package]]
 name = "oxml-wasm"
-version = "0.0.9"
+version = "0.0.10"
 dependencies = [
  "oxml",
  "wasm-bindgen",
