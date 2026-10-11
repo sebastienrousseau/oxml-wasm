@@ -67,8 +67,16 @@ fn compile(
     namespaces: &[String],
 ) -> Result<oxml::XPath, String> {
     let bindings = parse_bindings(namespaces)?;
-    oxml::XPath::compile_with_namespaces(expression, &bindings)
-        .map_err(|e| e.to_string())
+    // Expressions arrive from JavaScript, which may be running on
+    // somebody else's input. `Limits::strict()` bounds nesting and
+    // operator count so the worst case is an error, not a stack
+    // overflow in the page.
+    oxml::XPath::compile_with_namespaces_and_limits(
+        expression,
+        &bindings,
+        &oxml::Limits::strict(),
+    )
+    .map_err(|e| e.to_string())
 }
 
 /// The text of every matched node.

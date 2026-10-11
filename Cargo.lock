@@ -149,9 +149,7 @@ checksum = "d6790f58c7ff633d8771f42965289203411a5e5c68388703c06e14f24770b41e"
 
 [[package]]
 name = "oxml"
-version = "0.0.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21cfe82a88f49f99d04270f9c40041e372b3fc12050c140e84e672810e82a651"
+version = "0.0.10"
 
 [[package]]
 name = "oxml-wasm"
