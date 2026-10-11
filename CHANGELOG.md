@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Upgrade to `oxml` 0.0.10.** XPath predicates apply per context node
+  (`//row/cell[1]` returns one cell per row), `(//a)[1]` parses, and
+  node-set comparisons are existential, as XPath 1.0 specifies.
+- **XPath expressions are budgeted.** Every query compiles with
+  `Limits::strict()` (1,000 operators, 32 nesting levels); a deeper
+  expression is an error rather than a stack overflow.
 - **Ecosystem release cycle v0.0.10.** Begin next iteration cycle across the
   entire lockstep suite.
 - **Documentation migration.** Migrated website and rendered manual to
