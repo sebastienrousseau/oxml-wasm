@@ -2,7 +2,7 @@
 name = "oxml-wasm"
 version = "0.0.10"
 edition = "2024"
-rust-version = "1.86.0"
+rust-version = "1.89.0"
 license = "MIT OR Apache-2.0"
 description = "WebAssembly bindings for oxml: XML parsing and XPath in the browser"
 repository = "https://github.com/sebastienrousseau/oxml-wasm"
