@@ -5,9 +5,17 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.11] - Unreleased
+## [0.0.11] - 2026-10-17
 
 ### Changed
+
+- Apply explicit untrusted-document resource limits at the application
+  boundary; query frontends also use per-call XPath evaluation budgets.
+
+- Align the publishable package and family dependencies at 0.0.11,
+  refresh root/fuzz lockfiles, and retain Rust 1.89.0 as the minimum.
+- Validate closed issue/dependency changes against current sources and
+  use pinned compiler, coverage, fuzz and audit tools in CI.
 
 - **Breaking: the MSRV is now Rust 1.89.0** (was 1.86.0), one floor
   shared with the maintainer's other Rust crates.

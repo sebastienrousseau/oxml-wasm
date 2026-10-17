@@ -32,10 +32,11 @@ has to re-query from the root with a longer expression. Returning an
 opaque handle that later calls accept would fix that, and is bounded
 work now that `Document` already crosses the boundary.
 
-**2. Bounded parsing for the heap ceiling.** WebAssembly linear memory
-has a ceiling, and the whole tree is built in it. `oxml`'s limits API
-can refuse a document before it exhausts that, which turns a crashed
-module into an error a caller can handle.
+**Implemented: bounded parsing and evaluation.** Parsing uses the strict
+core profile, including 8 MiB source and decoded-document limits. Every
+query starts with fresh evaluation budgets. The runtime still needs its
+own linear-memory and execution limits; parser limits alone do not bound
+all host allocations.
 
 ## What is deliberately absent
 

@@ -25,6 +25,8 @@ use wasm_bindgen::prelude::*;
 /// the boundary; everything that decides anything lives here.
 pub mod core;
 
+mod output;
+
 /// A parsed XML document.
 #[wasm_bindgen]
 #[derive(Debug)]
