@@ -49,7 +49,7 @@ in either direction fails the build.
 
 - `#![forbid(unsafe_code)]`, checked by a CI job.
 - The `#[wasm_bindgen]` layer is exercised by `wasm-pack test --node` on every pull request — a path `cargo test` compiles to nothing and cannot reach.
-- Three Node example scripts assert with `node:assert/strict` and run in CI.
+- Four Node example scripts assert with `node:assert/strict` and run in CI.
 - Line coverage gated at a 95% floor.
 
 ## What this case does *not* claim

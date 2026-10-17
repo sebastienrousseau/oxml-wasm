@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Characterize scalar and direct-text conversion for comments, processing
+  instructions, text and namespace nodes. Native branch coverage passes
+  the unchanged 80% floor on the pinned nightly toolchain.
 - Align unpublished harnesses at 0.0.11 and match example coverage to
   exact source paths, with negative regression contracts in local/CI gates.
 - Wait for all actual release prerequisites before compiling, propagate
