@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Permit NCSA only for libfuzzer-sys 0.4.13 in the fuzz workspace;
+  retain the root license policy and check both graphs in CI.
+- Require an annotated tag signed by the approved public key, with the
+  exact project/version subject, and use crates.io Trusted Publishing
+  instead of a stored publishing token. Registry configuration still
+  requires independent confirmation before tagging.
+
 - Characterize scalar and direct-text conversion for comments, processing
   instructions, text and namespace nodes. Native branch coverage passes
   the unchanged 80% floor on the pinned nightly toolchain.
