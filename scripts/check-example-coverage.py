@@ -177,7 +177,10 @@ def main() -> int:
         ]
         declared = [(n, t) for n, t in candidates if not wasm_only(lines, n)]
         excluded += len(candidates) - len(declared)
-        keys = [k for k in counts if k.endswith(str(rel))]
+        # A sibling can also have src/lib.rs; suffix matching lets its
+        # execution counts stand in for this package. LLVM may report
+        # absolute or workspace-relative paths, both identifying one file.
+        keys = [k for k in counts if (ROOT / k).resolve() == path.resolve()]
         if not keys:
             # Not "nothing to check" -- a file with public functions and
             # no coverage data at all means the instrumented build never

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Align unpublished harnesses at 0.0.11 and match example coverage to
+  exact source paths, with negative regression contracts in local/CI gates.
+- Wait for all actual release prerequisites before compiling, propagate
+  publication failures and keep the laptop helper dry-run-only.
+
 - Apply explicit untrusted-document resource limits at the application
   boundary; query frontends also use per-call XPath evaluation budgets.
 

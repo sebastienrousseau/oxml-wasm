@@ -14,7 +14,7 @@ set -uo pipefail
 # the caller's. `git rev-parse` reads the *current* directory, so
 # running this by absolute path from anywhere else failed with
 # "fatal: not a git repository".
-cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1
 
 # The toolchain is named explicitly rather than left to
 # `rust-toolchain.toml`. A `RUSTUP_TOOLCHAIN` in the environment
@@ -49,6 +49,8 @@ step() {
 # is tracked, and CI then cannot create its build directory on top of
 # it -- every build job fails until it is removed.
 step "publish helper contract" python3 scripts/test-publish-dry-run.py
+step "release workflow contract" python3 scripts/test-release-workflow.py
+step "example coverage contract" python3 scripts/test-example-coverage.py
 step "no tracked build dir" bash -c '! git ls-files | grep -qx target'
 step "fmt"            cargo "+$TOOLCHAIN" fmt --all --check
 step "clippy"         cargo "+$TOOLCHAIN" clippy --all-targets --all-features -- -D warnings
@@ -84,6 +86,7 @@ else
   FAILED+=("wasm-pack steps not run")
 fi
 
+step "examples cover the API" python3 scripts/check-example-coverage.py
 step "coverage 95%" cargo "+$TOOLCHAIN" llvm-cov --remap-path-prefix --all-features --fail-under-lines 95 \
   --ignore-filename-regex 'builds/cargo/package|src/lib\.rs'
 # What `cargo publish` would upload, and whether the assurance case in
