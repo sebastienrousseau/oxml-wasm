@@ -10,10 +10,10 @@ Three layers, and the first one carries most of the weight.
 cargo test
 ```
 
-`src/core.rs` holds the logic and returns `String` errors, so it is
-testable without a WebAssembly toolchain. Fourteen tests, including
-four that assert the README's own examples produce what the README
-says.
+31 tests over the native binding logic, input/output budgets and
+node-kind conversions run without a WebAssembly toolchain.
+`src/core.rs` returns `String` errors. Four tests assert the README's
+own examples produce what the README says.
 
 Those four exist because two claims were wrong when written: the parse
 error message leads with a line and column before the library's byte
@@ -55,6 +55,7 @@ executed.
 | `basic.mjs` | Every method, predicates, the attribute axis, non-node-set results |
 | `errors.mjs` | Malformed documents, invalid expressions, external entities |
 | `memory.mjs` | `free()` in a loop, and using a freed document |
+| `serialise.mjs` | Serialisation/reparse fixed points, escaping and namespace retention |
 
 `examples/web/index.html` is a browser page with no bundler, run by
 hand.
@@ -85,8 +86,10 @@ broke is not much use.
 
 ## Coverage
 
-Line coverage is gated in CI at a 95% floor. **Branch coverage is
-100%**, gated at 80.
+Line coverage is gated in CI at a 95% floor; branch coverage is gated
+at 80%. The previously recorded 100% branch figure is a historical
+snapshot without an attached source head, not a measurement of this
+release candidate. Use the branch job for its exact-head result.
 
 Branch coverage needs a nightly toolchain: `cargo llvm-cov --branch`
 does not build on the version this project pins. It was recorded as

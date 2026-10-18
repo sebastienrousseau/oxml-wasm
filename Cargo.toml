@@ -1,12 +1,11 @@
 [package]
 name = "oxml-wasm"
-version = "0.0.10"
+version = "0.0.11"
 edition = "2024"
-rust-version = "1.86.0"
+rust-version = "1.89.0"
 license = "MIT OR Apache-2.0"
 description = "WebAssembly bindings for oxml: XML parsing and XPath in the browser"
 repository = "https://github.com/sebastienrousseau/oxml-wasm"
-homepage = "https://github.com/sebastienrousseau/oxml-wasm"
 documentation = "https://docs.rs/oxml-wasm"
 readme = "README.md"
 keywords = ["xml", "xpath", "wasm", "webassembly", "parser"]
@@ -42,11 +41,11 @@ crate-type = ["cdylib", "rlib"]
 [dev-dependencies]
 # The `#[wasm_bindgen]` layer cannot run under `cargo test`: it needs a
 # JavaScript runtime to hand values to. These tests run it in one.
-wasm-bindgen-test = "0.3"
+wasm-bindgen-test = "0.3.79"
 
 [dependencies]
-oxml = "0.0.10"
-wasm-bindgen = "0.2"
+oxml = "=0.0.11"
+wasm-bindgen = "0.2.129"
 
 [[example]]
 name = "query_a_document"

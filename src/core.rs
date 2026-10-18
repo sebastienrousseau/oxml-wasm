@@ -17,7 +17,7 @@
 /// The message names the line and column, because it crosses into
 /// JavaScript where a caller has no other way to locate the fault.
 pub fn parse(source: &str) -> Result<oxml::Document, String> {
-    oxml::parse(source).map_err(|e| {
+    oxml::parse_with(source, oxml::Limits::strict()).map_err(|e| {
         let (line, column) = e.line_column(source);
         format!("{line}:{column}: {e}")
     })
@@ -92,11 +92,15 @@ pub fn query_text(
     expression: &str,
     namespaces: &[String],
 ) -> Result<Vec<String>, String> {
-    let value = compile(expression, namespaces)?.evaluate(doc);
-    Ok(value.nodes().map_or_else(
-        || vec![value.to_str(doc)],
-        |nodes| nodes.iter().map(|n| doc.text(*n)).collect(),
-    ))
+    let value = evaluate(doc, expression, namespaces)?;
+    let Some(nodes) = value.nodes() else {
+        return Ok(vec![value.to_str(doc)]);
+    };
+    let mut remaining = oxml::xpath::EvalLimits::default().max_string_bytes;
+    nodes
+        .iter()
+        .map(|node| crate::output::text(doc, *node, &mut remaining, false))
+        .collect()
 }
 
 /// The expression's value as a string.
@@ -109,7 +113,12 @@ pub fn query_value(
     expression: &str,
     namespaces: &[String],
 ) -> Result<String, String> {
-    Ok(compile(expression, namespaces)?.evaluate(doc).to_str(doc))
+    let value = evaluate(doc, expression, namespaces)?;
+    let mut remaining = oxml::xpath::EvalLimits::default().max_string_bytes;
+    if let Some(node) = value.nodes().and_then(|nodes| nodes.first()) {
+        return crate::output::text(doc, *node, &mut remaining, true);
+    }
+    Ok(value.to_str(doc))
 }
 
 /// How many nodes an expression matches.
@@ -122,8 +131,7 @@ pub fn query_count(
     expression: &str,
     namespaces: &[String],
 ) -> Result<usize, String> {
-    Ok(compile(expression, namespaces)?
-        .evaluate(doc)
+    Ok(evaluate(doc, expression, namespaces)?
         .nodes()
         .map_or(0, <[oxml::NodeId]>::len))
 }
@@ -137,7 +145,19 @@ pub fn query_count(
 /// see `oxml`'s `stream` module for when it is not.
 #[must_use]
 pub fn is_well_formed(source: &str) -> bool {
-    oxml::parse(source).is_ok()
+    oxml::parse_with(source, oxml::Limits::strict()).is_ok()
+}
+
+fn evaluate(
+    doc: &oxml::Document,
+    expression: &str,
+    namespaces: &[String],
+) -> Result<oxml::xpath::Value, String> {
+    let context = oxml::xpath::EvalContext::new()
+        .with_limits(oxml::xpath::EvalLimits::default());
+    compile(expression, namespaces)?
+        .evaluate_with(doc, &context)
+        .map_err(|e| e.to_string())
 }
 
 /// The document as XML.

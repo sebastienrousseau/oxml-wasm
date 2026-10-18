@@ -12,7 +12,7 @@
   <a href="https://github.com/sebastienrousseau/oxml-wasm/actions"><img src="https://img.shields.io/github/actions/workflow/status/sebastienrousseau/oxml-wasm/ci.yml?style=for-the-badge&logo=github" alt="Build" /></a>
   <a href="https://crates.io/crates/oxml-wasm"><img src="https://img.shields.io/crates/v/oxml-wasm.svg?style=for-the-badge&color=fc8d62&logo=rust" alt="Crates.io" /></a>
   <a href="https://docs.rs/oxml-wasm"><img src="https://img.shields.io/badge/docs.rs-oxml--wasm-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" alt="Docs.rs" /></a>
-  <a href="https://scorecard.dev/viewer/?uri=github.com/sebastienrousseau/oxml-wasm"><img src="https://img.shields.io/ossf-scorecard/github.com/sebastienrousseau/oxml-wasm?style=for-the-badge&label=OpenSSF%20Scorecard&logo=openssf" alt="OpenSSF Scorecard" /></a>
+  <a href="https://github.com/sebastienrousseau/oxml-wasm/actions/workflows/scorecard.yml"><img src="https://img.shields.io/github/actions/workflow/status/sebastienrousseau/oxml-wasm/scorecard.yml?style=for-the-badge&label=Scorecard%20scan&logo=openssf" alt="Scorecard scan workflow status" /></a>
   <a href="https://www.bestpractices.dev/projects/14314"><img src="https://img.shields.io/cii/level/14314?style=for-the-badge&label=OpenSSF%20Best%20Practices&logo=openssf" alt="OpenSSF Best Practices" /></a>
 </p>
 
@@ -32,7 +32,7 @@
 
 **The oxml ecosystem**
 
-- [The oxml ecosystem](#the-oxml-ecosystem) — six crates, one version
+- [The oxml ecosystem](#the-oxml-ecosystem) — seven crates, one version
 
 **Reference**
 
@@ -41,7 +41,7 @@
 - [Errors](#errors) — what throws, and what it says
 - [Migration](#migration) — from `DOMParser`
 - [Ecosystem comparison](#ecosystem-comparison) — what each option costs you
-- [Capabilities in 0.0.8](#capabilities-in-008) — release inventory
+- [Capabilities in 0.0.11](#capabilities-in-0011) — release inventory
 - [Bundle size](#bundle-size) — how to measure yours
 - [Benchmarks](#benchmarks) — the core operations, measured natively
 
@@ -52,6 +52,7 @@
 - [FAQ](#faq)
 - [Development](#development)
 - [Security](#security)
+- [Roadmap](doc/ROADMAP.md)
 - [Documentation](#documentation)
 - [Acknowledgements](#acknowledgements)
 - [License](#license)
@@ -71,7 +72,7 @@ That is the whole argument for this package. Everything else follows.
 ## Install
 
 ```bash
-npm install oxml-wasm
+npm install oxml-wasm@0.0.11
 ```
 
 Or build it yourself:
@@ -85,7 +86,7 @@ wasm-pack build --target bundler  # for webpack, Vite, Rollup
 ## Quick Start
 
 ```javascript
-import init, { parse, is_well_formed } from "oxml-wasm";
+import init, { parse, isWellFormed } from "oxml-wasm";
 
 await init();
 
@@ -116,8 +117,9 @@ isWellFormed("<a>");                 // false
 | **`oxml-wasm`** | **This crate — WebAssembly** |
 | [`oxml-mcp`](https://github.com/sebastienrousseau/oxml-mcp) | Model Context Protocol server |
 | [`oxml-lsp`](https://github.com/sebastienrousseau/oxml-lsp) | Language Server Protocol server |
+| [`oxml-json`](https://github.com/sebastienrousseau/oxml-json) | JSON support for the language server |
 
-All six ship one version number, in steps of 0.0.1.
+All seven ship one version number, in steps of 0.0.1.
 
 ## API
 
@@ -225,7 +227,7 @@ time, because the expression is compiled when it is used.
 | `doc.documentElement.tagName` | `doc.rootName()` |
 | `doc.evaluate(e, doc, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null)` | `doc.queryText(e)` |
 | `doc.evaluate(e, doc, null, XPathResult.NUMBER_TYPE, null).numberValue` | `doc.queryValue(e)` |
-| namespace resolver argument | not supported — see the FAQ |
+| namespace resolver argument | pass `PREFIX=URI` bindings with the query |
 
 The most useful difference is error reporting. `DOMParser` signals a
 failure by returning a document containing a `<parsererror>` element,
@@ -252,7 +254,7 @@ when you need behaviour that does not vary by browser, or when the same
 queries have to run in Node and in a browser and give identical
 answers.
 
-## Capabilities in 0.0.8
+## Capabilities in 0.0.11
 
 - Full XML 1.0 and 1.1 parsing, namespaces resolved by URI
 - XPath 1.0: ten axes, 25 functions, all four value types
@@ -260,8 +262,9 @@ answers.
 - Node counts and root element name
 - No C toolchain, no `unsafe`, no network access
 
-**Not yet:** returning nodes rather than strings, mutation,
-serialisation, XSD validation, streaming, namespace prefix bindings.
+Serialization (`toXml`) and query namespace bindings are available.
+
+**Not yet:** returning node handles, mutation, XSD validation and streaming.
 
 ## Bundle size
 
@@ -443,17 +446,20 @@ The logic lives in `src/core.rs` and is tested natively, so most of the
 behaviour is covered without a WebAssembly toolchain. `src/lib.rs` is
 the thin `#[wasm_bindgen]` layer over it.
 
-The logic lives in `src/core.rs` and is tested natively, so most of the
-behaviour is covered without a WebAssembly toolchain. `src/lib.rs` is
-the thin `#[wasm_bindgen]` layer over it.
-
 ## Security
+
+Scorecard scans use a digest-pinned upstream image. Results are retained
+as CI artifacts and repository posture findings in GitHub code scanning,
+not published to Scorecard's public service. The badge shows workflow
+status, not a security score; a successful scan can still report findings.
 
 No network access, no filesystem access, external entities never
 dereferenced, entity expansion bounded, `#![forbid(unsafe_code)]`.
 
-A WebAssembly module is sandboxed by the runtime as well, so the worst
-a hostile document can do is exhaust the module's memory.
+Parsing uses `Limits::strict()` (including 8 MiB source and decoded
+document limits), and every XPath evaluation has fresh default work,
+node and string budgets. The runtime must still enforce linear-memory
+and execution limits; sandboxing is not a denial-of-service guarantee.
 
 See
 <https://github.com/sebastienrousseau/oxml/blob/main/doc/SECURITY-MODEL.md>.

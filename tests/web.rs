@@ -83,6 +83,21 @@ fn is_well_formed_answers_without_keeping_the_document() {
 }
 
 #[wasm_bindgen_test]
+fn a_budget_error_crosses_the_boundary_and_does_not_poison_the_document() {
+    let source = format!(
+        "<r>{}<n/>{}</r>",
+        "x".repeat(512 * 1024),
+        "x".repeat(512 * 1024 + 1)
+    );
+    let doc = parse(&source).expect("within the document budget");
+    assert!(doc.query_value("string(/r)", None).is_err());
+    assert_eq!(
+        doc.query_count("//n", None).expect("fresh per-call budget"),
+        1
+    );
+}
+
+#[wasm_bindgen_test]
 fn non_ascii_content_survives_the_boundary() {
     let doc = parse("<a><b>Germinal 😀 é 中</b></a>").expect("well-formed");
     let text = doc.query_text("//b", None).expect("valid");
