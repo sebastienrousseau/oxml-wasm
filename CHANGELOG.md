@@ -5,6 +5,19 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.13] - 2026-10-31
+
+### Security
+
+- **Dual-lockfile security auditing.** Enforce `cargo audit --deny warnings`
+  across both `Cargo.lock` and `fuzz/Cargo.lock` in
+  `.github/workflows/security.yml`.
+
+### Changed
+
+- **Ecosystem release cycle v0.0.13.** Align package and fuzz harness
+  metadata at `0.0.13` across the `oxml` suite.
+
 ## [0.0.12] - 2026-10-31
 
 ### Changed

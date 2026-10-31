@@ -41,7 +41,7 @@
 - [Errors](#errors) — what throws, and what it says
 - [Migration](#migration) — from `DOMParser`
 - [Ecosystem comparison](#ecosystem-comparison) — what each option costs you
-- [Capabilities in 0.0.12](#capabilities-in-0012) — release inventory
+- [Capabilities in 0.0.13](#capabilities-in-0013) — release inventory
 - [Bundle size](#bundle-size) — how to measure yours
 - [Benchmarks](#benchmarks) — the core operations, measured natively
 
@@ -72,7 +72,7 @@ That is the whole argument for this package. Everything else follows.
 ## Install
 
 ```bash
-npm install oxml-wasm@0.0.12
+npm install oxml-wasm@0.0.13
 ```
 
 Or build it yourself:
@@ -254,7 +254,7 @@ when you need behaviour that does not vary by browser, or when the same
 queries have to run in Node and in a browser and give identical
 answers.
 
-## Capabilities in 0.0.12
+## Capabilities in 0.0.13
 
 - Full XML 1.0 and 1.1 parsing, namespaces resolved by URI
 - XPath 1.0: ten axes, 25 functions, all four value types
