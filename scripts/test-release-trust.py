@@ -28,7 +28,7 @@ class ReleaseTrust(unittest.TestCase):
         self.assertNotIn("secrets.CARGO_REGISTRY_TOKEN", self.workflow)
         self.assertIn("id-token: write", self.workflow)
         self.assertIn("contents: read", self.workflow)
-        self.assertIn("uses: rust-lang/crates-io-auth-action@c6f97d42243bad5fab37ca0427f495c86d5b1a18", self.workflow)
+        self.assertIn("uses: rust-lang/crates-io-auth-action@3268eb413133e2960fa4ae0e963ca76380c54cd9", self.workflow)
         self.assertIn("CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}", self.workflow)
         auth = self.workflow.index("id: auth")
         self.assertLess(self.workflow.index("run: cargo test --locked"), auth)
@@ -47,7 +47,7 @@ class ReleaseTrust(unittest.TestCase):
         block = self.workflow.split(marker, 1)[1].split("\n      - ", 1)[0]
         script = textwrap.dedent(block.split("run: |\n", 1)[1])
         env = dict(os.environ, GIT_CONFIG_NOSYSTEM="1",
-                   GIT_CONFIG_GLOBAL=os.devnull, GITHUB_REF_NAME="v0.0.11")
+                   GIT_CONFIG_GLOBAL=os.devnull, GITHUB_REF_NAME="v0.0.12")
         with tempfile.TemporaryDirectory() as folder:
             fixture = Path(folder)
             run(["git", "init", "-q", "."], fixture, env)
@@ -66,21 +66,21 @@ class ReleaseTrust(unittest.TestCase):
             (fixture / ".github/allowed_signers").write_text(
                 'test@example.invalid namespaces="git" ' + public + "\n")
             cases = [
-                (["-s", "-m", self.crate + " v0.0.11"], True),
-                (["-s", "-m", "wrong v0.0.11"], False),
-                (["-a", "-m", self.crate + " v0.0.11"], False),
+                (["-s", "-m", self.crate + " v0.0.12"], True),
+                (["-s", "-m", "wrong v0.0.12"], False),
+                (["-a", "-m", self.crate + " v0.0.12"], False),
                 ([], False),
                 (["-s", "-u", str(fixture / "untrusted"),
-                  "-m", self.crate + " v0.0.11"], False),
+                  "-m", self.crate + " v0.0.12"], False),
             ]
             for args, accepted in cases:
                 with self.subTest(args=args):
-                    run(["git", "tag", *args, "v0.0.11"], fixture, env)
+                    run(["git", "tag", *args, "v0.0.12"], fixture, env)
                     result = subprocess.run(["bash", "-euo", "pipefail", "-c", script],
                                             cwd=fixture, env=env, text=True,
                                             capture_output=True, timeout=30)
                     self.assertEqual(result.returncode == 0, accepted, result.stderr)
-                    run(["git", "tag", "-d", "v0.0.11"], fixture, env)
+                    run(["git", "tag", "-d", "v0.0.12"], fixture, env)
 
 
 if __name__ == "__main__":

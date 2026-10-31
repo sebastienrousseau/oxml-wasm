@@ -5,6 +5,22 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.12] - 2026-10-31
+
+### Changed
+
+- **Upgrade to `oxml` 0.0.12.** Align package and fuzz harness metadata
+  at `0.0.12` and refresh root and fuzz lockfiles.
+- **Automated GitHub release pipeline.** Add the `release-page` workflow
+  job to verify the published crates.io archive, generate CycloneDX SBOMs
+  and SHA-256 checksums, and attach SLSA build provenance attestations.
+- **Scorecard pull-request SARIF parity.** Normalize `pull_request`
+  Scorecard SARIF output so `supply-chain/branch-protection` and
+  `supply-chain/online-scm` configurations are always reported.
+- **CI and release action updates.** Advance `Swatinem/rust-cache` to
+  v2.9.3, `taiki-e/install-action` to v2.88.0, `github/codeql-action` to
+  v4.39.1, and `rust-lang/crates-io-auth-action` to v1.0.6.
+
 ## [0.0.11] - 2026-10-17
 
 ### Changed

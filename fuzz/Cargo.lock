@@ -83,13 +83,13 @@ checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
 
 [[package]]
 name = "oxml"
-version = "0.0.11"
+version = "0.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a87b5208e19be9156660b4cf008a2b7b864502dbe5c3833dc47155fd2d4ea14"
+checksum = "099a65b3139999c480e6e8973c2c7ddba41be2acda6fc9375a5569f072d7aa93"
 
 [[package]]
 name = "oxml-wasm"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "oxml",
  "wasm-bindgen",
@@ -97,7 +97,7 @@ dependencies = [
 
 [[package]]
 name = "oxml-wasm-fuzz"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "libfuzzer-sys",
  "oxml-wasm",
