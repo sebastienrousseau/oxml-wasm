@@ -47,7 +47,7 @@ class ReleaseTrust(unittest.TestCase):
         block = self.workflow.split(marker, 1)[1].split("\n      - ", 1)[0]
         script = textwrap.dedent(block.split("run: |\n", 1)[1])
         env = dict(os.environ, GIT_CONFIG_NOSYSTEM="1",
-                   GIT_CONFIG_GLOBAL=os.devnull, GITHUB_REF_NAME="v0.0.12")
+                   GIT_CONFIG_GLOBAL=os.devnull, GITHUB_REF_NAME="v0.0.13")
         with tempfile.TemporaryDirectory() as folder:
             fixture = Path(folder)
             run(["git", "init", "-q", "."], fixture, env)
@@ -66,21 +66,21 @@ class ReleaseTrust(unittest.TestCase):
             (fixture / ".github/allowed_signers").write_text(
                 'test@example.invalid namespaces="git" ' + public + "\n")
             cases = [
-                (["-s", "-m", self.crate + " v0.0.12"], True),
-                (["-s", "-m", "wrong v0.0.12"], False),
-                (["-a", "-m", self.crate + " v0.0.12"], False),
+                (["-s", "-m", self.crate + " v0.0.13"], True),
+                (["-s", "-m", "wrong v0.0.13"], False),
+                (["-a", "-m", self.crate + " v0.0.13"], False),
                 ([], False),
                 (["-s", "-u", str(fixture / "untrusted"),
-                  "-m", self.crate + " v0.0.12"], False),
+                  "-m", self.crate + " v0.0.13"], False),
             ]
             for args, accepted in cases:
                 with self.subTest(args=args):
-                    run(["git", "tag", *args, "v0.0.12"], fixture, env)
+                    run(["git", "tag", *args, "v0.0.13"], fixture, env)
                     result = subprocess.run(["bash", "-euo", "pipefail", "-c", script],
                                             cwd=fixture, env=env, text=True,
                                             capture_output=True, timeout=30)
                     self.assertEqual(result.returncode == 0, accepted, result.stderr)
-                    run(["git", "tag", "-d", "v0.0.12"], fixture, env)
+                    run(["git", "tag", "-d", "v0.0.13"], fixture, env)
 
 
 if __name__ == "__main__":
