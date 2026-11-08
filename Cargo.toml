@@ -44,7 +44,7 @@ crate-type = ["cdylib", "rlib"]
 wasm-bindgen-test = "0.3.79"
 
 [dependencies]
-oxml = "=0.0.12"
+oxml = "=0.0.13"
 wasm-bindgen = "0.2.129"
 
 [[example]]
